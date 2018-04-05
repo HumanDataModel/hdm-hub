@@ -1,5 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+
+import SeedList from './SeedList'
+
+import { initializeSeeds, createNewSeed } from "../actions/actions";
+
+import { notify } from "../actions/actions"
 
 
 class Seeds extends React.Component {
@@ -8,44 +16,19 @@ class Seeds extends React.Component {
 
     this.state = {
       test: "",
-      data: [
-        {
-          username: "bob",
-          identity: "bob@hd",
-          companionUUID: "FB694B90-F49E-4597-8306-171BBA78F844",
-          facebookID: "102684690214746",
-          devices: {
-            "5BF2E050-4730-46DE-B6A7-2C8BE4D9FA36": "bob@iphoneSE",
-            "FB694B90-F49E-4597-8306-171BBA78F844": "bob@mac"
-          }
-        }, {
-          username: "alice",
-          identity: "alice@hd",
-          companionUUID: "717F860E-F0E6-4C93-A4E3-CC724D27E05E",
-          facebookID: "119560198524790",
-          devices: {
-            "717F860E-F0E6-4C93-A4E3-CC724D27E05E": "alice@iphone",
-            "8B034F7B-FA9B-540F-ACF3-88C0CA70C84F": "alice@ibeacon"
-          }
-        }, {
-          username: "nkm",
-          identity: "nkm@hd",
-          companionUUID: "717F860E-F0E6-4C93-A4E3-CC724D27E05B",
-          facebookID: "120144918465781",
-          devices: {
-            "717F860E-F0E6-4C93-A4E3-CC724D27E05E": "nkm@iphone5"
-          }
-        }
-      ]
+      data: []
     }
 
     this.setStateHandler = this.setStateHandler.bind(this);
+  }
 
+  componentDidMount() {
+    this.props.initializeSeeds()
   }
 
   setStateHandler() {
     var i = {
-      username: "uusi",
+      ownername: "uusi",
       identity: "nkm@hd",
       companionUUID: "717F860E-F0E6-4C93-A4E3-CC724D27E05B",
       facebookID: "120144918465781",
@@ -55,86 +38,96 @@ class Seeds extends React.Component {
     };
     var myA = this.state.data;
     myA.push(i);
-    this.setState({data: myA});
+    this.setState({ data: myA });
   }
 
 
+
+
   render() {
+
+    const seedsToShow = () => {
+      return this.context.store.getState().seeds
+    }
+
+
     return (
       <div>
 
-        <SeedGenerator myTestProp={this.state.test} updateStateProp={this.updateState} setStateHandler={this.setStateHandler} clearInput={this.clearInput}></SeedGenerator>
-        <SeedsList seedsProp={this.state.data}></SeedsList>
+        <SeedForm createNewSeed={this.props.createNewSeed} />
+        <SeedList seeds={seedsToShow()} />
 
       </div>
     );
   }
 }
 
-class SeedGenerator extends React.Component {
+class SeedForm extends React.Component {
 
   constructor() {
     super();
-
-    this.state = {
-      test: ""
-    };
-
     this.clearInput = this.clearInput.bind(this);
     this.updateState = this.updateState.bind(this);
 
   }
 
   updateState(e) {
-    this.setState({test: e.target.value});
+    this.setState({ test: e.target.value });
   }
 
   clearInput() {
-    this.setState({test: ''});
+    this.setState({ test: '' });
     ReactDOM.findDOMNode(this.refs.myInput).focus();
   }
 
+
+  addSeedFile = async (event) => {
+    event.preventDefault()
+
+    //const content = event.target.note.value
+    //event.target.note.value = ''
+    const newSeedObject = {
+      "identity": "alice@hd22",
+      "facebookID": "119560198524790",
+      "companionUUID": "717F860E-F0E6-4C93-A4E3-CC724D27E05E",
+      "devices": {
+        "717F860E-F0E6-4C93-A4E3-CC724D27E05E": "alice@iphone",
+        "8B034F7B-FA9B-540F-ACF3-88C0CA70C84F": "alice@ibeacon"
+      }
+    }
+    this.props.createNewSeed(newSeedObject)
+  }
+
+
   render() {
     return (
-      <div className="seedGenerator">
-        <h4>Device identity: {this.state.test}@device</h4>
+      <div className="seedForm">
+        {/*<h4>Device identity: {this.state.test}@device</h4>*/}
         Username:
-        <input type="text" value={this.state.test} onChange={this.updateState} ref="myInput"/>
-        <br/>
-        <br/>
-        <button onClick={this.props.setStateHandler}>Create Seed file</button>
+        <input type="text" value={this.context.store.getState().test} onChange={this.updateState} ref="myInput" />
+        <br />
+        <br />
+        <button onClick={this.addSeedFile}>Create Seed file</button>
         <button onClick={this.clearInput}>CLEAR</button>
       </div>
     );
   }
 }
 
-class SeedsList extends React.Component {
+SeedForm.contextTypes = {
+  store: PropTypes.object
+}
 
-  render() {
-    return (
-      <div className="seedsList">
-        <table>
-          <tbody>
-            {this.props.seedsProp.map((seedFile, i) => <SeedFileTableRow key={i} data={seedFile}/>)}
-          </tbody>
-        </table>
-      </div>
-    );
+//export default Seeds;
+const mapStateToProps = (state) => {
+  const seedsToShow = state.seeds//.filter(seed => seed.ownername.toLowerCase().includes(state.filter))
+  return {
+    seedsToShow
   }
 }
 
-class SeedFileTableRow extends React.Component {
-  render() {
-    return (
-      <tr>
-        <td>{this.props.data.identity}</td>
-        <td>{this.props.data.username}</td>
-        <td>{this.props.data.companionUUID}</td>
-      </tr>
-    );
-  }
+Seeds.contextTypes = {
+  store: PropTypes.object
 }
 
-
-export default Seeds;
+export default connect(mapStateToProps, { initializeSeeds, createNewSeed, notify })(Seeds)
