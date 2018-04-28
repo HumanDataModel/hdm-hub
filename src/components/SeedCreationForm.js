@@ -22,7 +22,7 @@ const UsernameForm = (props) => {
           <Form.Input
           onChange={props.handleChange}
             fluid
-            icon='owner'
+            icon='user'
             iconPosition='left'
             name='ownername'
             placeholder='Username'
@@ -81,7 +81,7 @@ const ConfirmForm = (props) => {
           <p>Hit submit to create new seed!</p>
           <Form.Input
             fluid
-            icon='owner'
+            icon='user'
             iconPosition='left'
             name='ownername'
             disabled
@@ -104,7 +104,7 @@ const StepGroup = ({ props }) => {
 
     <Step.Group fluid>
       <Step active={props.ownernameFormVisible}>
-        <Icon name='owner' />
+        <Icon name='user' />
         <Step.Content>
           <Step.Title>Username</Step.Title>
           <Step.Description>Choose your ownername</Step.Description>
@@ -120,7 +120,7 @@ const StepGroup = ({ props }) => {
       </Step>
 
       <Step active={props.confirmFormVisible}>
-        <Icon name='add owner' />
+        <Icon name='add user' />
         <Step.Content>
           <Step.Title>Confirm</Step.Title>
           <Step.Description>Please, comfirm and submit</Step.Description>

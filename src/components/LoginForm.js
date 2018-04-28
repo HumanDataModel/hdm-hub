@@ -39,7 +39,7 @@ class LoginForm extends React.Component {
               <Segment stacked>
                 <Form.Input
                   fluid
-                  icon='owner'
+                  icon='user'
                   iconPosition='left'
                   name='ownername'
                   onChange={this.props.handleLoginChange}
